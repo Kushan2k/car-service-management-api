@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  first_name   String
+  last_name    String
+  password     String
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  contact_no   String?
+  address      String?
+  role         Role         @default(USER)
+  vehicles     Vehicle[]
+  appointments Appointment?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Vehicle {
+  id           String       @id @default(uuid())
+  type         String
+  model        String
+  year         Int
+  number       String       @unique
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  owner_id     String
+  user         User         @relation(fields: [owner_id], references: [id])
+  appointments Appointment?
+}
+
+model Appointment {
+  id          Int               @id @default(autoincrement())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  userId      String            @unique
+  customer    User              @relation(fields: [userId], references: [id])
+  vehicalId   String            @unique
+  car         Vehicle           @relation(fields: [vehicalId], references: [id])
+  rentalStart DateTime
+  rentalEnd   DateTime
+  status      AppointmentStatus
+  notes       String?
+  invoice     Invoice?
+
+  invoiceId Int
+}
+
+// Remove the enum definition for AppointmentStatus
+enum AppointmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+model Invoice {
+  id            Int         @id @default(autoincrement())
+  total         Float
+  discount      Float
+  createdAt     DateTime    @default(now())
+  payment_type  PaymentType
+  updatedAt     DateTime    @updatedAt
+  appointmentId Int         @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+enum PaymentType {
+  CASH
+  CARD
+  ONLINE
+}
