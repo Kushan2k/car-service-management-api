@@ -51,6 +51,45 @@ Router.post("/register", async (req, res) => {
   res.status(201).send({ msg: "user registerd!", user })
 })
 
+//admin registration
+Router.post("/register/admin", async (req, res) => {
+  const data = req.body
+
+  console.log(data)
+
+  if (data.secrent != process.env.ADMIN_KEY) {
+    res.send({ msg: "un authorized!" }).status(402)
+    return
+  }
+
+  if (!data.username || !data.password) {
+    res.send({ msg: "all the fileds is required!" }).status(401)
+    return
+  }
+
+  const existingUser = await db.admin.findUnique({
+    where: {
+      username: data.username,
+    },
+  })
+
+  if (existingUser) {
+    console.log("user found!")
+    res.status(403).send({ msg: "user already registerd!" })
+    return
+  }
+
+  data.password = await bcrypt.hash(data.password, 10)
+
+  const user = await db.admin.create({
+    data: {
+      ...data,
+    },
+  })
+
+  res.status(201).send({ msg: "admin registerd!", user })
+})
+
 Router.post("/login", async (req, res) => {
   const data = req.body
 

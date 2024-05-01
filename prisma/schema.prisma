@@ -88,3 +88,12 @@ enum PaymentType {
   CARD
   ONLINE
 }
+
+model Admin {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  password   String
+  role       Role     @default(ADMIN)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
