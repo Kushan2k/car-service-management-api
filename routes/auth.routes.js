@@ -2,6 +2,7 @@ const express = require("express")
 const { db } = require("../utils/index")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const authMidleware = require("../midleware/checklogin.jwt")
 
 require("dotenv").config()
 
@@ -57,7 +58,7 @@ Router.post("/register/admin", async (req, res) => {
 
   console.log(data)
 
-  if (data.secrent != process.env.ADMIN_KEY) {
+  if (data.secret != process.env.ADMIN_KEY) {
     res.send({ msg: "un authorized!" }).status(402)
     return
   }
@@ -83,7 +84,8 @@ Router.post("/register/admin", async (req, res) => {
 
   const user = await db.admin.create({
     data: {
-      ...data,
+      password: data.password,
+      username: data.username,
     },
   })
 
@@ -141,6 +143,54 @@ Router.post("/login", async (req, res) => {
   res.status(200).send({ token, responseuser })
 })
 
+//admin user login
+Router.post("/login/admin", async (req, res) => {
+  const data = req.body
+
+  console.log(data)
+
+  if (!data.username || !data.password) {
+    res.status(403).send({ msg: "input required!" })
+    return
+  }
+
+  const user = await db.admin.findUnique({
+    where: {
+      username: data.username,
+    },
+  })
+
+  if (!user) {
+    res.status(404).send({ msg: "Not found!" })
+    return
+  }
+
+  const passwordMatch = await bcrypt.compare(data.password, user.password)
+
+  if (!passwordMatch) {
+    res.status(401).send({ msg: "unauthorized! password miss match" })
+    return
+  }
+
+  const token = jwt.sign(
+    {
+      email: user.email,
+      role: user.role,
+      id: user.id,
+    },
+    process.env.JWT_SECRET,
+    { algorithm: "HS256" }
+  )
+
+  const responseuser = {
+    email: user.email,
+    id: user.id,
+    role: user.role,
+  }
+
+  res.status(200).send({ token, responseuser })
+})
+
 Router.patch("/users/:id", async (req, res) => {
   const data = req.body
 
@@ -176,6 +226,33 @@ Router.patch("/users/:id", async (req, res) => {
   } catch (er) {
     res.status(500).send(er)
   }
+})
+
+Router.get("/users", authMidleware, async (req, res) => {
+  const allusers = await db.user.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+  })
+
+  res.send(allusers).status(200)
+})
+
+Router.delete("/users/:id", authMidleware, async (req, res) => {
+  const id = req.params.id
+
+  if (!id) {
+    res.send({ msg: "bad request" }).status(400)
+    return
+  }
+
+  await db.user.delete({
+    where: {
+      id,
+    },
+  })
+
+  res.send({ msg: "deleted!" }).status(200)
 })
 
 module.exports = Router
