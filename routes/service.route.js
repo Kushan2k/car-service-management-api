@@ -1,6 +1,19 @@
 const Router = require("express").Router()
 const { db } = require("../utils/index")
 
+Router.get("", async (req, res) => {
+  const servicesall = await db.service.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+    include: {
+      user: true,
+      vehical: true,
+    },
+  })
+  res.send(servicesall).status(200)
+})
+
 Router.get("/:id", async (req, res) => {
   const { id } = req.params
 
@@ -23,6 +36,26 @@ Router.get("/:id", async (req, res) => {
   })
 
   res.send(serives).status(200)
+})
+
+Router.patch("/update", async (req, res) => {
+  const { sid, status } = req.body
+  // console.log(sid)
+  if (!sid) {
+    res.send({ msg: "unauthorized!" }).status(400)
+    return
+  }
+
+  const service = await db.service.update({
+    where: {
+      id: sid,
+    },
+    data: {
+      status: status,
+    },
+  })
+
+  res.send(service).status(201)
 })
 
 Router.post("", async (req, res) => {
