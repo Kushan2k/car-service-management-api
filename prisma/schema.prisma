@@ -26,6 +26,7 @@ model User {
   role         Role         @default(USER)
   vehicles     Vehicle[]
   appointments Appointment?
+  services     Service[]
 }
 
 enum Role {
@@ -44,6 +45,7 @@ model Vehicle {
   owner_id     String
   user         User         @relation(fields: [owner_id], references: [id])
   appointments Appointment?
+  service      Service[]
 }
 
 model Appointment {
@@ -94,6 +96,23 @@ model Admin {
   username   String   @unique
   password   String
   role       Role     @default(ADMIN)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum Status {
+  FINISHED
+  ONGOING
+}
+
+model Service {
+  id         String   @id @default(uuid())
+  type       String
+  user_id    String
+  status     Status   @default(ONGOING)
+  user       User     @relation(fields: [user_id], references: [id])
+  vehical_id String
+  vehical    Vehicle  @relation(fields: [vehical_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }

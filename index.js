@@ -7,6 +7,7 @@ const authMidleware = require("./midleware/checklogin.jwt")
 //routes
 const authRoutes = require("./routes/auth.routes")
 const vechicalRoutes = require("./routes/vehical.route")
+const serviceRoutes = require("./routes/service.route")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes)
 app.use("/api/vehicals", authMidleware, vechicalRoutes)
+app.use("/api/services", authMidleware, serviceRoutes)
 
 db.$connect()
   .then(() => {
