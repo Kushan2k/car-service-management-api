@@ -31,7 +31,7 @@ This API was created using Node.js, Express.js, MySQL, and Prisma ORM. It provid
     "password": "password123"
   }
 
-´´´jabascript
+´´´javascript
 
  fetch("")
 ´´´
