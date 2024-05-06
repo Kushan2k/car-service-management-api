@@ -12,3 +12,26 @@ To get started with this API, follow these steps:
     cd repository-folder
     npm install
    ```
+
+# API Documentation
+
+This API was created using Node.js, Express.js, MySQL, and Prisma ORM. It provides endpoints for user registration and login, as well as admin registration and login.
+
+## Endpoints
+
+### User Registration
+
+#### Endpoint: `/api/auth/register`
+- Method: `POST`
+- Description: Allows users to register.
+- Request Body:
+  ```json
+  {
+    "username": "example_user",
+    "password": "password123"
+  }
+
+´´´jabascript
+
+ fetch("")
+´´´
