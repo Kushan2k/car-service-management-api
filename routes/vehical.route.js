@@ -40,7 +40,7 @@ Router.post("", async (req, res) => {
   })
 
   if (car) {
-    res.status(201).send({ msg: "already registerd!" })
+    res.status(400).send({ msg: "already registerd!" })
     return
   }
 

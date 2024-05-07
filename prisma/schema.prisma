@@ -115,4 +115,5 @@ model Service {
   vehical    Vehicle  @relation(fields: [vehical_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  total      Int?     @default(0)
 }

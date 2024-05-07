@@ -39,7 +39,7 @@ Router.get("/:id", async (req, res) => {
 })
 
 Router.patch("/update", async (req, res) => {
-  const { sid, status } = req.body
+  const { sid, status, total } = req.body
   // console.log(sid)
   if (!sid) {
     res.send({ msg: "unauthorized!" }).status(400)
@@ -52,6 +52,7 @@ Router.patch("/update", async (req, res) => {
     },
     data: {
       status: status,
+      total: parseInt(total),
     },
   })
 
