@@ -27,6 +27,7 @@ model User {
   vehicles     Vehicle[]
   appointments Appointment?
   services     Service[]
+  orders       Order[]
 }
 
 enum Role {
@@ -116,4 +117,28 @@ model Service {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   total      Int?     @default(0)
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  qty         Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  img         String?  @default("https://ralfvanveen.com/wp-content/uploads/2021/06/Placeholder-_-Glossary.svg")
+  orders      Order[]
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id])
+  qty        Int
+  total      Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

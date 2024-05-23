@@ -8,10 +8,12 @@ const authMidleware = require("./midleware/checklogin.jwt")
 const authRoutes = require("./routes/auth.routes")
 const vechicalRoutes = require("./routes/vehical.route")
 const serviceRoutes = require("./routes/service.route")
+const productRoutes = require("./routes/products.route")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
+app.use(express.static("public"))
 
 app.get("/", (req, res) => {
   res.send({ msg: "hello world" }).status(200)
@@ -20,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/vehicals", authMidleware, vechicalRoutes)
 app.use("/api/services", authMidleware, serviceRoutes)
+app.use("/api/products", authMidleware, productRoutes)
 
 db.$connect()
   .then(() => {
