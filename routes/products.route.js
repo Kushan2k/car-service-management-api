@@ -27,7 +27,11 @@ Router.get("/:item_id", async (req, res) => {
 })
 
 Router.get("", async (req, res) => {
-  const products = await db.product.findMany()
+  const products = await db.product.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+  })
 
   // console.log(req.hostname, req.baseUrl)
 
@@ -168,6 +172,51 @@ Router.post("/create-order", async (req, res) => {
   } catch (error) {
     console.log(error)
     res.send({ msg: "order placing failed!", error: error }).status(500)
+  }
+})
+
+Router.post("", async (req, res) => {
+  const { name, description, price, imageUrl, qty } = req.body
+
+  if (!name || !description || !price || !imageUrl || !qty) {
+    res.send({ msg: "all fileds are required" }).status(400)
+    return
+  }
+  try {
+    const newproduct = await db.product.create({
+      data: {
+        name: name,
+        description: description,
+        price: price,
+        img: imageUrl,
+        qty: qty,
+      },
+    })
+
+    res.send({ newproduct }).status(201)
+  } catch (er) {
+    res.send({ msg: "error", error: er }).status(500)
+  }
+})
+
+Router.delete("/:item_id", async (req, res) => {
+  const { item_id } = req.params
+
+  if (!item_id) {
+    res.send({ msg: "all fileds are required" }).status(400)
+    return
+  }
+
+  try {
+    await db.product.delete({
+      where: {
+        id: item_id,
+      },
+    })
+    res.send({ msg: "deleted!" }).status(201)
+  } catch (er) {
+    console.log(er)
+    res.send({ msg: "error", error: er }).status(500)
   }
 })
 
