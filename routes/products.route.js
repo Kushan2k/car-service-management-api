@@ -220,4 +220,40 @@ Router.delete("/:item_id", async (req, res) => {
   }
 })
 
+Router.put("/:item_id", async (req, res) => {
+  const { item_id } = req.params
+
+  if (!item_id) {
+    res.send({ msg: "all fileds are required" }).status(400)
+    return
+  }
+
+  const { name, description, price, imageUrl, qty } = req.body
+
+  if (!name || !description || !price || !imageUrl || !qty) {
+    res.send({ msg: "all fileds are required" }).status(400)
+    return
+  }
+
+  try {
+    const product = await db.product.update({
+      where: {
+        id: item_id,
+      },
+      data: {
+        name: name,
+        description: description,
+        price: price,
+        img: imageUrl,
+        qty: qty,
+      },
+    })
+
+    res.send(product).status(201)
+  } catch (error) {
+    console.log(er)
+    res.send({ msg: "error", error: er }).status(500)
+  }
+})
+
 module.exports = Router
